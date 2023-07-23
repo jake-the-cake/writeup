@@ -1,12 +1,12 @@
 import { NextFunction, Request, Response } from "express"
-import { Schema } from "../models/Model"
+import { ClientModel } from "../models/client"
 
-export type DataModel<T, K extends keyof T> = {
+export type DataModel<T> = {
 	name: string
 	schema: T
-	fields: K[]
-	required?: K[]
-	unique?: K[]
+	fields: string[]
+	required?: string[]
+	unique?: string[]
 
 }
 
@@ -28,15 +28,13 @@ interface ControllerOptions {
 type ControllerArg = (ControllerOptions | (() => void))[]
 
 type GenericController = (
-	model: DataModel<IndexAny, string>,
+	model: DataModel<IndexAny>,
 	args: ControllerArg
 ) => ExpressFunction
 
 const create: GenericController = function (model, ...args) {
 	let f: () => void, options: IndexAny
-	// new Schema({data:'here'})
-	console.log(new Schema({data:'here'}))
-	// new Schema({})
+
 	return (req, res, next) => {
 		if (args) args.forEach((arg: ControllerArg) => {
 			if (typeof arg === 'function' && !f) f = arg
@@ -48,3 +46,5 @@ const create: GenericController = function (model, ...args) {
 }
 
 export { create }
+
+ClientModel

@@ -1,18 +1,23 @@
 import express from 'express'
-import JSONdb from 'simple-json-db'
 import http from 'http'
 import { APPLICATION } from './config'
 import { create } from './controllers/generic'
+import { connectDB } from './db'
+import { ClientModel } from './models/client'
 
-const DB = new JSONdb('./data.json')
-
-if (DB) startApp()
+connectDB('./data.json', startApp)
+	.then(({ db, serve, callback }: any) => {
+		console.log(db)
+		if (db) serve()
+		callback()
+	})
+	.catch((err: any) => console.log(err))
 
 function startApp() {
 	const app = express()
 	const port = APPLICATION.PORT
 	// @ts-ignore
-	app.get('/', create({}, {data:'stuff'}, () => {console.log('')}))
+	app.get('/', create(ClientModel, {data:'stuff'}, () => {console.log('')}))
 	http.createServer(app).listen(port, () => {
 		console.log(`Server running on port ${ port }`)
 	})
